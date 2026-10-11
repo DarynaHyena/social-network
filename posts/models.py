@@ -1,0 +1,53 @@
+from django.db import models
+from social_network.settings import AUTH_USER_MODEL
+from communities.models import Community
+
+# клас для постів
+class Posts(models.Model):
+    title = models.CharField(max_length=200, verbose_name='Назва')
+    content = models.TextField(blank=True, null=True, verbose_name='Вміст')
+    author = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts', verbose_name='Автор')
+    community = models.ForeignKey(Community, on_delete=models.CASCADE,  related_name='posts',verbose_name='Спільнота')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Допис'
+        verbose_name_plural = 'Дописи'
+
+
+#клас для коментарів
+class Comment(models.Model):
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name='comments', verbose_name='Допис')
+    author = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comments', verbose_name='Автор')
+    content = models.TextField(verbose_name='Вміст')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Коментар'
+        verbose_name_plural = 'Коментарі'
+
+
+#клас для збереження лайків
+class Like(models.Model):
+
+    class VoteValue(models.IntegerChoices):
+        LIKE = 1, 'Лайк'
+        DISLIKE = -1, 'Дизлайк'
+
+    post_item = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name='likes', verbose_name='Допис')
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='likes', verbose_name='Користувач')
+    vote = models.SmallIntegerField(choices=VoteValue.choices, verbose_name='Голос')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('post_item', 'user')
+        verbose_name = 'Лайк'
+        verbose_name_plural = 'Лайки'
