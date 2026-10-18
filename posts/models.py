@@ -1,5 +1,5 @@
 from django.db import models
-from social_network.settings import AUTH_USER_MODEL
+from settings.settings import AUTH_USER_MODEL
 from communities.models import Community
 
 # клас для постів
