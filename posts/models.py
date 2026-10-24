@@ -17,6 +17,9 @@ class Posts(models.Model):
         verbose_name = 'Допис'
         verbose_name_plural = 'Дописи'
 
+    def __str__(self):
+        return f"{self.pk} {self.title} - {self.author.username}"
+
 
 #клас для коментарів
 class Comment(models.Model):
@@ -32,6 +35,8 @@ class Comment(models.Model):
         verbose_name = 'Коментар'
         verbose_name_plural = 'Коментарі'
 
+    def __str__(self):
+        return f" Comment by {self.pk}"
 
 #клас для збереження лайків
 class Like(models.Model):
@@ -51,3 +56,20 @@ class Like(models.Model):
         unique_together = ('post_item', 'user')
         verbose_name = 'Лайк'
         verbose_name_plural = 'Лайки'
+
+
+#клас для збереження репостів
+class Share(models.Model):
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="shares", verbose_name="Користувач")
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE,related_name="shares",verbose_name="Допис")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "post"],
+                name="unique_user_post_share",
+            )
+        ]
