@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}
+Видалення поста {{ post.title }}
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-success">Видалити</button>
+    <a href="{% url 'post-detail' post.pk %}" class="btn btn-secondary">Назад до допису</a>
+  </form>
+</div>
+{% endblock %}

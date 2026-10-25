@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+Створення поста
+{% endblock %}
+
+{% block content %}
+<h2>Створеня поста</h2>
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% if object%}
+    <button type="submit" class="btn btn-outline-success">Зберегти</button>
+  {% else %}
+    <button type="submit" class="btn btn-outline-success">Створити</button>
+  {% endif %}
+</form>
+{% endblock %}
