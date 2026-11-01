@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block content %}
-<h2>Створеня поста</h2>
+<h2>Створення поста</h2>
 <form method="POST" enctype="multipart/form-data">
   {% csrf_token %}
   {{ form.as_p }}

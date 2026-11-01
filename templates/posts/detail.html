@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Дорис {{ post.title }}
+Допис {{ post.title }}
 {% endblock %}
 
 {% block content %}
@@ -22,6 +22,71 @@
       </div>
     </div>
     <a href="#">Card link</a>
+
+    {% if post.media %}
+      <li class="list-group-item">
+        {% if post.is_image %}
+          <img src="{{ post.media.url }}" alt="Зображення" class="img-fluid rounded d-block mx-auto" style="max-height: 450px;">
+
+        {% elif post.is_video %}
+          <video controls class="w-100 rounded" style="max-height: 450px;">
+            <source src="{{ post.media.url }}">Ваш браузер не підтримує відео.
+          </video>
+
+        {% elif post.is_audio %}
+          <audio controls class="w-100">
+            <source src="{{ post.media.url }}">Ваш браузер не підтримує аудіо.
+          </audio>
+
+        {% else %}
+          <a href="{{ post.media.url }}" target="_blank" class="btn btn-outline-primary">Відкрити файл</a>
+        {% endif %}
+      </li>
+    {% endif %}
+
   </div>
 </div>
+
+<h2>Коментарі</h2>
+<a href="{% url 'comment-create' post.pk %}" type="button" class="btn-solid theme-inverse">Додати коментар</a>
+
+{% for comment in comments %}
+  <div class="card my-2">
+    <div class="card-body">
+
+      <figure class="mb-0">
+
+        <blockquote class="blockquote">
+          <p>{{ comment.content }}</p>
+        </blockquote>
+
+        {% if comment.media %}
+          <li class="list-group-item">
+            {% if post.is_image %}
+              <img src="{{ post.media.url }}" alt="Зображення" class="img-fluid rounded d-block mx-auto" style="max-height: 450px;">
+
+            {% elif post.is_video %}
+              <video controls class="w-100 rounded" style="max-height: 450px;">
+                <source src="{{ post.media.url }}">Ваш браузер не підтримує відео.
+              </video>
+
+            {% elif post.is_audio %}
+              <audio controls class="w-100">
+                <source src="{{ post.media.url }}">Ваш браузер не підтримує аудіо.
+              </audio>
+
+            {% else %}
+              <a href="{{ post.media.url }}" target="_blank" class="btn btn-outline-primary">Відкрити файл</a>
+            {% endif %}
+          </li>
+        {% endif %}
+
+        <figcaption class="blockquote-footer">
+          {{ comment.author }} <cite title="Source Title">{{ comment.created_at }}</cite>
+        </figcaption>
+      </figure>
+    </div>
+  </div>   
+{% endfor %}
+
 {% endblock %}

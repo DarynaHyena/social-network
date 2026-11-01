@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-Видалення коментаря {{ post.title }}
+Видалення коментаря {{ comment.post.title }}
 {% endblock %}
 
 
@@ -9,7 +9,7 @@
   <form method="post">
     {% csrf_token %}
     <button type="submit" class="btn btn-outline-success">Видалити</button>
-    <a href="{% url 'post-detail' post.pk %}" class="btn btn-secondary">Назад до допису</a>
+    <a href="{% url 'post-detail' comment.post.pk %}" class="btn btn-secondary">Назад до допису</a>
   </form>
 </div>
 {% endblock %}

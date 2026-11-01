@@ -1,6 +1,7 @@
 from django.db import models
 from settings.settings import AUTH_USER_MODEL
 from communities.models import Community
+from pathlib import Path
 
 # клас для постів
 class Posts(models.Model):
@@ -8,7 +9,21 @@ class Posts(models.Model):
     content = models.TextField(blank=True, null=True, verbose_name='Вміст')
     author = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts', verbose_name='Автор')
     community = models.ForeignKey(Community, on_delete=models.CASCADE,  related_name='posts',verbose_name='Спільнота')
+    media = models.FileField(upload_to='posts/', blank=True, null=True, verbose_name="Файли")
 
+    @property
+    def extension(self):
+        return Path(self.media.name).suffix.lower()
+    @property
+    def is_image(self):
+        return self.extension in [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+    @property
+    def is_video(self):
+        return self.extension in [".mp4", ".webm", ".mov"]
+    @property
+    def is_audio(self):
+        return self.extension in [".mp3", ".wav", ".ogg"]
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -26,7 +41,21 @@ class Comment(models.Model):
     post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name='comments', verbose_name='Допис')
     author = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comments', verbose_name='Автор')
     content = models.TextField(verbose_name='Вміст')
+    media = models.FileField(upload_to='posts/', blank=True, null=True, verbose_name="Файли")
 
+    @property
+    def extension(self):
+        return Path(self.media.name).suffix.lower()
+    @property
+    def is_image(self):
+        return self.extension in [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+    @property
+    def is_video(self):
+        return self.extension in [".mp4", ".webm", ".mov"]
+    @property
+    def is_audio(self):
+        return self.extension in [".mp3", ".wav", ".ogg"]
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -67,6 +96,9 @@ class Share(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = 'Репост'
+        verbose_name_plural = 'Репости'
+
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "post"],

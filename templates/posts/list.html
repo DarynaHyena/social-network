@@ -3,9 +3,10 @@
 Домашня сторінка
 {% endblock %}
 
-
-
 {% block content %}
+
+<h2>Останні публікації</h2>
+<a href="{% url 'post-create' %}" type="button" class="btn-solid theme-inverse">Додати допис</a>
 
 {% for post in posts %}
 <div class="list-group my-2">

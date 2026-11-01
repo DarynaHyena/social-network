@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Спільнота {{ community.name }}
+{% endblock %}
+
+{% block content %}
+
+<h2>Останні публікації</h2>
+<a href="{% url 'post-create' %}" type="button" class="btn-solid theme-inverse">Додати допис</a>
+
+{% for post in posts %}
+<div class="list-group my-2">
+      <a href="{% url 'post-detail' post.pk %}" class="list-group-item list-group-item-action">{{ post.title }}
+      <span class="badge rounded-pill text-bg-primary">{{ post.author }}</span>
+      <span class="badge rounded-pill text-bg-info">{{ post.community }}</span>
+      </a>
+    </div>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}
+Спільноти
+{% endblock %}
+
+{% block content %}
+
+<h2>Наші спільноти</h2>
+<a href="{% url 'community-create' %}" type="button" class="btn-solid theme-inverse">Створити нову спільноту</a>
+
+{% for community in communities %}
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <img src="{{ community.image }}" class="card-img" alt="Зображення спільноти">
+    <h5 class="mt-2 mb-0">{{ community.name }}</h5>
+    <p class="card-text fg-2">{{ community.description }}</p>
+    <small class="fg-3">Last updated {{ community.updated_at }}</small>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+
