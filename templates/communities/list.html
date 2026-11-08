@@ -6,8 +6,9 @@
 {% block content %}
 
 <h2>Наші спільноти</h2>
+<hr>
 <a href="{% url 'community-create' %}" type="button" class="btn-solid theme-inverse">Створити нову спільноту</a>
-
+<hr>
 {% for community in communities %}
 <div class="card" style="width: 18rem;">
   <div class="card-body">

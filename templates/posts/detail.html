@@ -7,11 +7,13 @@
 {% block content %}
 <div class="card" style="max-width: 320px;">
   <div class="d-flex w-100 justify-content-between">
-      <h4 class="card-title">{{ post.title }}</h4>
       <small>{{ post.created_at }}</small>
-    </div>
+  </div>
+  <hr>
   <div class="card-body">
+    <h4 class="card-title">{{ post.title }}</h4>
     <p class="card-text">{{ post.content }}</p>
+    <hr>
     <div class="row">
       <div class="col">
         <p class="card-subtitle fg-3">{{ post.author }}</p>
@@ -21,7 +23,12 @@
         <p class="card-subtitle fg-3">{{ post.community }}</p>
       </div>
     </div>
-    <a href="#">Card link</a>
+
+    {% if user == post.author or user.role in 'admin' %}
+      <a href="{% url 'post-update' post.pk %}" class="btn btn-outline-primary">Редагувати</a>
+      <a href="{% url 'post-delete' post.pk %}" class="btn btn-outline-danger">Видалити</a>
+    {% endif %}
+
 
     {% if post.media %}
       <li class="list-group-item">
@@ -87,6 +94,15 @@
       </figure>
     </div>
   </div>   
+
+  {% if user == post.author or user.role in 'admin' %}
+    <a href="{% url 'post-update' post.pk %}" class="btn btn-outline-primary">Редагувати</a>
+    <a href="{% url 'post-delete' post.pk %}" class="btn btn-outline-danger">Видалити</a>
+  {% endif %}
+
+{% empty %}
+  <p>Коментарів ще немає.</p>
+  
 {% endfor %}
 
 {% endblock %}

@@ -55,10 +55,15 @@ class CommunityDetailView(DetailView):
     context_object_name = 'community'
     template_name = 'communities/detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['posts'] = self.object.posts.all()
+        return context
+
 
 class CommunityDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Community
-    template_name = 'communities/confirm_delete.html'
+    template_name = 'communities/delete.html'
     success_url = reverse_lazy("community-list")
 
     def test_func(self):

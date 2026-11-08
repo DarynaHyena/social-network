@@ -47,7 +47,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         post = self.get_object()
-        return self.request.user == post.creator or self.request.user.role in ['admin']
+        return self.request.user == post.author or self.request.user.role in ['admin']
 
     def get_success_url(self):
         return reverse("post-detail", kwargs={"pk": self.object.pk})
@@ -64,9 +64,14 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = 'posts/delete.html'
     success_url = reverse_lazy("post-list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = self.object.comments.all()
+        return context
+
     def test_func(self):
         post = self.get_object()
-        return self.request.user == post.creator or self.request.user.role in ['admin']
+        return self.request.user == post.author or self.request.user.role in ['admin']
 
 
 
@@ -81,11 +86,11 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        form.instance.post = self.post_object
+        form.instance.post = get_object_or_404(Posts, pk=self.kwargs['post_pk'])
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("post-detail", kwargs={"pk": self.post_object.pk})
+        return reverse("post-detail", kwargs={"pk": self.object.post.pk})
 
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -108,7 +113,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         comment = self.get_object()
         user = self.request.user
-        return user == comment.creator or user.role in ['admin']
+        return user == comment.author or user.role in ['admin']
 
     def get_success_url(self):
         return reverse('task-detail', kwargs={'pk':self.object.task_id})
