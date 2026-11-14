@@ -24,7 +24,41 @@
       </div>
     </div>
 
-    {% if user == post.author or user.role in 'admin' %}
+  <div class="d-flex flex-wrap gap-2 mt-3">
+    {% if user.is_authenticated %}
+      <form method="POST" action="{% url 'post-like' post.pk %}">
+        {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn {% if post.user_vote == 1 %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            🖒 {{ post.likes_count }}
+          </button>
+      </form>
+
+      <form method="POST" action="{% url 'post-dislike' post.pk %}">
+        {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn {% if post.user_vote == -1 %}btn-danger{% else %}btn-outline-danger{% endif %}">
+            🖓 {{ post.dislikes_count }}
+          </button>
+      </form>
+
+      <form method="POST" action="{% url 'post-share' post.pk %}">
+        {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn btn-outline-secondary">
+            🗘 Репост ({{ post.shares_count }})
+          </button>
+      </form>
+
+    {% else %}
+      <span class="text-muted">🖒 {{ post.likes_count }}</span>
+      <span class="text-muted">🖓 {{ post.dislikes_count }}</span>
+      <span class="text-muted">🗘 {{ post.shares_count }}</span>
+    {% endif %}
+
+  </div>
+
+    {% if user == post.author or user.role == 'admin' %}
       <a href="{% url 'post-update' post.pk %}" class="btn btn-outline-primary">Редагувати</a>
       <a href="{% url 'post-delete' post.pk %}" class="btn btn-outline-danger">Видалити</a>
     {% endif %}
@@ -69,21 +103,21 @@
 
         {% if comment.media %}
           <li class="list-group-item">
-            {% if post.is_image %}
-              <img src="{{ post.media.url }}" alt="Зображення" class="img-fluid rounded d-block mx-auto" style="max-height: 450px;">
+            {% if comment.is_image %}
+              <img src="{{ comment.media.url }}" alt="Зображення" class="img-fluid rounded d-block mx-auto" style="max-height: 450px;">
 
-            {% elif post.is_video %}
+            {% elif comment.is_video %}
               <video controls class="w-100 rounded" style="max-height: 450px;">
-                <source src="{{ post.media.url }}">Ваш браузер не підтримує відео.
+                <source src="{{ comment.media.url }}">Ваш браузер не підтримує відео.
               </video>
 
-            {% elif post.is_audio %}
+            {% elif comment.is_audio %}
               <audio controls class="w-100">
-                <source src="{{ post.media.url }}">Ваш браузер не підтримує аудіо.
+                <source src="{{ comment.media.url }}">Ваш браузер не підтримує аудіо.
               </audio>
 
             {% else %}
-              <a href="{{ post.media.url }}" target="_blank" class="btn btn-outline-primary">Відкрити файл</a>
+              <a href="{{ comment.media.url }}" target="_blank" class="btn btn-outline-primary">Відкрити файл</a>
             {% endif %}
           </li>
         {% endif %}
@@ -95,7 +129,7 @@
     </div>
   </div>   
 
-  {% if user == post.author or user.role in 'admin' %}
+  {% if user == post.author or user.role == 'admin' %}
     <a href="{% url 'post-update' post.pk %}" class="btn btn-outline-primary">Редагувати</a>
     <a href="{% url 'post-delete' post.pk %}" class="btn btn-outline-danger">Видалити</a>
   {% endif %}

@@ -1,8 +1,11 @@
 from django.db import models
 from settings.settings import AUTH_USER_MODEL
 from pathlib import Path
+from django.conf import settings
 
 
+
+# Клас для спільнот
 class Community(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="Назва")
     description = models.TextField(blank=True, verbose_name="Опис")
@@ -32,3 +35,26 @@ class Community(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+# Клас для членства спільнот
+class CommunityMembership(models.Model):
+
+    class MembershipRole(models.TextChoices):
+        MEMBER = 'member'
+        MODERATOR = 'moderator'
+
+    community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='memberships')
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='community_memberships')
+    role = models.CharField(max_length=20, choices=MembershipRole.choices, default=MembershipRole.MEMBER)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['community', 'user'], name='unique_community_member')]
+
+        verbose_name = 'Учасник спільноти'
+        verbose_name_plural = 'Учасники спільнот'
+
+    def str(self):
+        return f'{self.user.username} — {self.community.name}'

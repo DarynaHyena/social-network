@@ -13,4 +13,9 @@ urlpatterns = [
     path("<int:post_pk>/comment/create/", views.CommentCreateView.as_view(), name="comment-create"),
     path('comment/update/<int:pk>/', views.CommentUpdateView.as_view(), name='comment-update'),
     path('comment/delete/<int:pk>/', views.CommentDeleteView.as_view(), name='comment-delete'),
+
+    # urls для лайків, дизлайків та поширень
+    path('<int:pk>/like/', views.like_post, name='post-like'),
+    path('<int:pk>/dislike/', views.dislike_post, name='post-dislike'),
+    path('<int:pk>/share/', views.share_post, name='post-share'),
 ]

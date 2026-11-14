@@ -12,20 +12,15 @@
       <div class="drawer-body mb-2 md:mb-0">
         <ul class="nav navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link active" aria-current="page" href="{% url 'post-list' %}">Home</a>
           </li>
           <li class="nav-item">
-            <button class="nav-link" type="button" data-bs-toggle="menu" aria-expanded="false">
+            <a class="nav-link" type="button"  href="{% url 'community-list' %}" data-bs-toggle="menu" aria-expanded="false">
               Community
-            </button>
-            <div class="menu">
-              <a class="menu-item" href="#">Community1</a>
-              <a class="menu-item" href="#">Community2</a>
-              <a class="menu-item" href="#">Community3</a>
-            </div>
+            </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Profile</a>
+            <a class="nav-link" href="{% url 'profile' %}">Profile</a>
           </li>
         </ul>
         <form class="hstack gap-2" role="search">

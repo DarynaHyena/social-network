@@ -132,5 +132,8 @@ MAILERS = {
 
 
 AUTH_USER_MODEL = 'authentication.CustomUser'
-LOGIN_REDIRECT_URL = '/profile/'
-LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/auth/profile/'
+LOGIN_URL = '/auth/login/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

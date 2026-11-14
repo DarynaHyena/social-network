@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Редагування профілю | Nexora{% endblock %}
+
+{% block content %}
+
+<style>
+    .profile-edit-wrapper {
+        max-width: 680px;
+        margin: 35px auto;
+    }
+
+    .profile-edit-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+    }
+
+    .profile-edit-header {
+        background: linear-gradient(135deg, #252b48, #514b80);
+        color: white;
+        padding: 30px;
+    }
+
+    .profile-avatar {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #514b80;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .profile-edit-body {
+        padding: 30px;
+    }
+
+    .profile-edit-body label {
+        font-weight: 600;
+        margin-bottom: 7px;
+        color: #343a40;
+    }
+
+    .profile-edit-body input {
+        border-radius: 9px;
+        padding: 11px 13px;
+    }
+
+    .profile-edit-body input:focus {
+        border-color: #7166a8;
+        box-shadow: 0 0 0 3px rgba(113, 102, 168, 0.15);
+    }
+
+    .profile-field {
+        margin-bottom: 20px;
+    }
+
+    .profile-save-btn {
+        background: #514b80;
+        color: white;
+        border: none;
+        border-radius: 9px;
+        padding: 11px 24px;
+        transition: 0.2s;
+    }
+
+    .profile-save-btn:hover {
+        background: #39345f;
+        color: white;
+    }
+
+    .profile-cancel-btn {
+        border-radius: 9px;
+        padding: 10px 20px;
+    }
+
+    @media (max-width: 576px) {
+        .profile-edit-wrapper {
+            margin: 15px auto;
+        }
+
+        .profile-edit-header,
+        .profile-edit-body {
+            padding: 22px;
+        }
+    }
+</style>
+
+<div class="profile-edit-wrapper">
+    <div class="profile-edit-card">
+
+        <div class="profile-edit-header">
+            <div class="profile-avatar">
+                {{ user.username|first|upper }}
+            </div>
+
+            <h2 class="mb-1">Редагування профілю</h2>
+            <p class="mb-0 opacity-75">
+                Онови інформацію про себе в Nexora
+            </p>
+        </div>
+
+        <div class="profile-edit-body">
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+
+
+                <div class="mb-3">
+                    <label for="{{ form.avatar.id_for_label }}" class="form-label">
+                        Аватар
+                    </label>
+
+                    {{ form.avatar }}
+
+                    {% for error in form.avatar.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.cover.id_for_label }}" class="form-label">
+                        Обкладинка
+                    </label>
+
+                    {{ form.cover }}
+
+                    {% for error in form.cover.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="profile-field">
+                    <label for="{{ form.username.id_for_label }}">
+                        Ім'я користувача
+                    </label>
+
+                    {{ form.username }}
+
+                    {% for error in form.username.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="profile-field">
+                    <label for="{{ form.email.id_for_label }}">
+                        Електронна пошта
+                    </label>
+
+                    {{ form.email }}
+
+                    {% for error in form.email.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="profile-field">
+                            <label for="{{ form.first_name.id_for_label }}">
+                                Ім'я
+                            </label>
+
+                            {{ form.first_name }}
+
+                            {% for error in form.first_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="profile-field">
+                            <label for="{{ form.last_name.id_for_label }}">
+                                Прізвище
+                            </label>
+
+                            {{ form.last_name }}
+
+                            {% for error in form.last_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn profile-save-btn">
+                        Зберегти зміни
+                    </button>
+
+                    <a href="{% url 'post-list' %}"
+                       class="btn btn-outline-secondary profile-cancel-btn">
+                        Скасувати
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

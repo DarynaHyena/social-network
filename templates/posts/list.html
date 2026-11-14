@@ -10,11 +10,45 @@
 
 {% for post in posts %}
 <div class="list-group my-2">
-      <a href="{% url 'post-detail' post.pk %}" class="list-group-item list-group-item-action">{{ post.title }}
-      <span class="badge rounded-pill text-bg-primary">{{ post.author }}</span>
-      <span class="badge rounded-pill text-bg-info">{{ post.community }}</span>
-      </a>
-    </div>
+  <a href="{% url 'post-detail' post.pk %}" class="list-group-item list-group-item-action">{{ post.title }}
+    <span class="badge rounded-pill text-bg-primary">{{ post.author }}</span>
+    <span class="badge rounded-pill text-bg-info">{{ post.community }}</span>
+  </a>
+
+  <div class="d-flex flex-wrap gap-2 mt-3">
+    {% if user.is_authenticated %}
+      <form method="POST" action="{% url 'post-like' post.pk %}">
+        {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn {% if post.user_vote == 1 %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            🖒 {{ post.likes_count }}
+          </button>
+      </form>
+
+      <form method="POST" action="{% url 'post-dislike' post.pk %}">
+        {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn {% if post.user_vote == -1 %}btn-danger{% else %}btn-outline-danger{% endif %}">
+            🖓 {{ post.dislikes_count }}
+          </button>
+      </form>
+
+      <form method="POST" action="{% url 'post-share' post.pk %}">
+        {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn btn-outline-secondary">
+            🗘 Репост ({{ post.shares_count }})
+          </button>
+      </form>
+
+    {% else %}
+      <span class="text-muted">🖒 {{ post.likes_count }}</span>
+      <span class="text-muted">🖓 {{ post.dislikes_count }}</span>
+      <span class="text-muted">🗘 {{ post.shares_count }}</span>
+    {% endif %}
+
+  </div>
+</div>
 {% endfor %}
 
 {% endblock %}

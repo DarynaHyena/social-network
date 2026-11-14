@@ -8,3 +8,5 @@ class CustomUser(AbstractUser):
         ('admin', 'Адміністратор'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Аватар')
+    cover = models.ImageField(upload_to='covers/', blank=True, null=True, verbose_name='Обкладинка')

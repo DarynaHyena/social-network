@@ -6,6 +6,45 @@
 
 {% block content %}
 
+<h2>{{ community.name }}</h2>
+<p>{{ community.description }}</p>
+<p class="text-muted">
+  Учасників: {{ members_count }}
+</p>
+
+{% if user.is_authenticated %}
+  {% if is_member %}
+
+    {% if user != community.owner %}
+      <form method="POST" action="{% url 'community-leave' community.pk %}">
+        {% csrf_token %}
+          <button type="submit" class="btn btn-outline-danger">
+            Покинути спільноту
+          </button>
+      </form>
+    {% else %}
+      <span class="badge bg-secondary">Власник спільноти</span>
+    {% endif %}
+
+    <!-- <a href="{% url 'post-create' %}" class="btn btn-primary mt-2">
+            Додати допис
+        </a> -->
+
+  {% else %}
+    <form method="POST" action="{% url 'community-join' community.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">
+        Приєднатися
+      </button>
+    </form>
+  {% endif %}
+
+{% else %}
+    <p>Увійдіть, щоб приєднатися до спільноти.</p>
+{% endif %}
+
+
+
 <h2>Останні публікації</h2>
 <a href="{% url 'post-create' %}" type="button" class="btn-solid theme-inverse">Додати допис</a>
 <hr>
