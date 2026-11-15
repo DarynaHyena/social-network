@@ -12,9 +12,9 @@
 {% for community in communities %}
 <div class="card" style="width: 18rem;">
   <div class="card-body">
-    <img src="{{ community.image }}" class="card-img" alt="Зображення спільноти">
-    <h5 class="mt-2 mb-0">{{ community.name }}</h5>
-    <p class="card-text fg-2">{{ community.description }}</p>
+    <img src="{{ community.media.url }}" class="card-img" alt="Зображення спільноти">
+    <a class="btn-text theme-inverse text-decoration-none" href="{% url 'community-detail' community.pk %}">Назва: {{ community.name }}</a>
+    <p class="card-text fg-2">Опис: {{ community.description }}</p>
     <small class="fg-3">Last updated {{ community.updated_at }}</small>
   </div>
 </div>

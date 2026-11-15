@@ -8,13 +8,31 @@
 
 <h2>{{ community.name }}</h2>
 <p>{{ community.description }}</p>
+<hr>
 <p class="text-muted">
   Учасників: {{ members_count }}
 </p>
 
+
 {% if user.is_authenticated %}
   {% if is_member %}
+    {% if user == community.owner %}
+      <span class="badge bg-success">Ви є власником спільноти</span>
+    {% else %}
+      <span class="badge bg-primary">Ви є учасником спільноти</span>
+    {% endif %}
 
+    {% if user == community.owner %}
+      <a href="{% url 'community-update' community.pk %}" class="btn btn-outline-primary">
+        Редагувати спільноту
+      </a>
+      <form method="POST" action="{% url 'community-delete' community.pk %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger">
+          Видалити спільноту
+        </button>
+      </form>
+    {% endif %}
     {% if user != community.owner %}
       <form method="POST" action="{% url 'community-leave' community.pk %}">
         {% csrf_token %}
@@ -22,13 +40,7 @@
             Покинути спільноту
           </button>
       </form>
-    {% else %}
-      <span class="badge bg-secondary">Власник спільноти</span>
     {% endif %}
-
-    <!-- <a href="{% url 'post-create' %}" class="btn btn-primary mt-2">
-            Додати допис
-        </a> -->
 
   {% else %}
     <form method="POST" action="{% url 'community-join' community.pk %}">

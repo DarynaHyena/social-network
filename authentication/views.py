@@ -9,7 +9,7 @@ from .forms import CustomUserCreationForm, UserProfileForm
 class RegisterView(CreateView):
     template_name = 'authentication/register.html'
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy('auth:profile')
+    success_url = reverse_lazy('profile')
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -24,3 +24,8 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_object(self):
         return self.request.user
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['files'] = self.request.FILES
+        return kwargs

@@ -30,6 +30,9 @@ class PostListView(PostStatsMixin, ListView):
     template_name = 'posts/list.html'
     paginate_by = 5
 
+    def get_queryset(self):
+        return Posts.objects.all().order_by('-created_at')
+
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     form_class = PostForm
@@ -41,7 +44,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         user = self.request.user
         is_member = CommunityMembership.objects.filter(community=community, user=user).exists()
         if community.owner_id == user.id:
-            CommunityMembership.objects.get_or_create(community=community,vuser=user, defaults={'role': CommunityMembership.MembershipRole.MODERATOR})
+            CommunityMembership.objects.get_or_create(community=community, user=user, defaults={'role': CommunityMembership.MembershipRole.MODERATOR})
             is_member = True
 
         if not is_member:
@@ -49,7 +52,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
             return self.form_invalid(form)
 
         form.instance.author = user
-
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -64,7 +66,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         post = self.get_object()
-        return self.request.user == post.author or self.request.user.role in ['admin']
+        return self.request.user == post.author or self.request.user.role == 'admin' or self.request.user.is_superuser
 
     def get_success_url(self):
         return reverse("post-detail", kwargs={"pk": self.object.pk})
@@ -83,12 +85,13 @@ class PostDetailView(PostStatsMixin, DetailView):
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Posts
+    context_object_name = 'post'
     template_name = 'posts/delete.html'
     success_url = reverse_lazy("post-list")
 
     def test_func(self):
         post = self.get_object()
-        return self.request.user == post.author or self.request.user.role in ['admin']
+        return self.request.user == post.author or self.request.user.role == 'admin' or self.request.user.is_superuser
 
 
 
@@ -119,7 +122,7 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         comment = self.get_object()
         user = self.request.user
         
-        return user == comment.author or user.role == 'admin'
+        return user == comment.author or user.role == 'admin' or user.is_superuser
 
     # def test_func(self):
     #     post = self.get_object()
@@ -131,12 +134,13 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
+    context_object_name = 'comment'
     template_name = 'comments/delete.html'
 
     def test_func(self):
         comment = self.get_object()
         user = self.request.user
-        return user == comment.author or user.role in ['admin']
+        return user == comment.author or user.role == 'admin' or user.is_superuser
 
     def get_success_url(self):
         return reverse('post-detail', kwargs={'pk':self.object.post_id})

@@ -19,15 +19,24 @@
     }
 
     .profile-edit-header {
-        background: linear-gradient(135deg, #252b48, #514b80);
+        position: relative;
+        background: linear-gradient(
+            rgba(25, 25, 45, 0.35),
+            rgba(25, 25, 45, 0.55)
+        );
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
         color: white;
         padding: 30px;
+        min-height: 250px;
     }
 
     .profile-avatar {
-        width: 76px;
-        height: 76px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
+        overflow: hidden;
         background: #ffffff;
         color: #514b80;
         display: flex;
@@ -35,7 +44,26 @@
         justify-content: center;
         font-size: 30px;
         font-weight: 700;
-        margin-bottom: 15px;
+    }
+
+    .avatar-preview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-cover {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    .profile-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .profile-edit-body {
@@ -95,10 +123,21 @@
 
 <div class="profile-edit-wrapper">
     <div class="profile-edit-card">
-
-        <div class="profile-edit-header">
+        <div class="profile-edit-header"
+            {% if user.cover %}
+                style="background-image:
+                linear-gradient(rgba(25, 25, 45, 0.35), rgba(25, 25, 45, 0.55)),
+                url('{{ user.cover.url }}');"
+            {% endif %}>
+            
             <div class="profile-avatar">
-                {{ user.username|first|upper }}
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}"
+                        alt="Аватар користувача"
+                        class="avatar-preview">
+                {% else %}
+                    {{ user.username|first|upper }}
+                {% endif %}
             </div>
 
             <h2 class="mb-1">Редагування профілю</h2>
@@ -108,7 +147,6 @@
         </div>
 
         <div class="profile-edit-body">
-
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
 
@@ -212,6 +250,17 @@
                 </div>
 
             </form>
+
+            <hr class="my-4">
+
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn-outline-danger">
+                    Вийти з акаунта
+                </button>
+            </form>
+
         </div>
     </div>
 </div>

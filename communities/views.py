@@ -55,7 +55,7 @@ class CommunityUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         community = self.get_object()
-        return self.request.user == community.owner or self.request.user.role in ['admin']
+        return self.request.user == community.owner or self.request.user.role == 'admin' or self.request.user.is_superuser
 
     def get_success_url(self):
         return reverse("community-detail", kwargs={"pk": self.object.pk})
@@ -68,15 +68,12 @@ class CommunityDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['posts'] = self.object.posts.all()
-
+        context['posts'] = self.object.posts.order_by('-created_at')
         if self.request.user.is_authenticated:
             context['is_member'] = (self.object.memberships.filter(user=self.request.user).exists() or self.object.owner_id == self.request.user.id)
         else:
             context['is_member'] = False
-
         context['members_count'] = self.object.memberships.count()
-
         return context
 
 
@@ -87,7 +84,7 @@ class CommunityDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         community = self.get_object()
-        return self.request.user == community.owner or self.request.user.role in ['admin']
+        return self.request.user == community.owner or self.request.user.role == 'admin' or self.request.user.is_superuser
 
 
 
