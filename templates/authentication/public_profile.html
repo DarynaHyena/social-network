@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Профіль {{ user_profile.username }} | Nexora{% endblock %}
+
+{% block content %}
+
+<style>
+</style>
+
+<div class="profile-page">
+    <div class="profile-card">
+        <div class="profile-cover"
+            {% if user_profile.cover %}
+                style="background-image: url('{{ user_profile.cover.url }}');"
+            {% endif %}>
+        </div>
+
+        <div class="profile-main">
+            <div class="profile-top">
+                {% if user_profile.avatar %}
+                    <img src="{{ user_profile.avatar.url }}" class="profile-avatar" alt="Аватар користувача">
+                {% else %}
+                    <div class="profile-avatar avatar-placeholder">
+                        {{ user_profile.username|first|upper }}
+                    </div>
+                {% endif %}
+
+                {% if request.user == user_profile %}
+                    <a href="{% url 'profile' %}" class="edit-profile">
+                        ✎ Редагувати профіль
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="profile-name">
+                {% if user_profile.first_name or user_profile.last_name %}
+                    {{ user_profile.first_name }} {{ user_profile.last_name }}
+                {% else %}
+                    {{ user_profile.username }}
+                {% endif %}
+            </div>
+
+            <div class="profile-username">
+                @{{ user_profile.username }}
+            </div>
+
+            <span class="profile-role">
+                {{ user_profile.get_role_display }}
+            </span>
+
+            <div class="profile-info">
+                На Nexora з {{ user_profile.date_joined|date:"d.m.Y" }}
+            </div>
+
+        </div>
+    </div>
+
+
+    <hr>
+    <h2 class="section-title">Статистика</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-number">{{ posts_count }}</span>
+            <span class="stat-label">Дописи</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-number">{{ likes_count }}</span>
+            <span class="stat-label">Вподобання</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-number">{{ comments_count }}</span>
+            <span class="stat-label">Коментарі</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-number">{{ shares_count }}</span>
+            <span class="stat-label">Поширення</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-number">{{ communities_count }}</span>
+            <span class="stat-label">Спільноти</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-number">{{ owned_communities_count }}</span>
+            <span class="stat-label">Власні спільноти</span>
+        </div>
+
+    </div>
+
+
+    <hr>
+    <h2 class="section-title">Дописи користувача</h2>
+
+    {% for post in posts %}
+        <div class="post-card">
+            <div class="post-title">
+                {{ post.title }}
+            </div>
+
+            <div class="post-content">
+                {{ post.content|linebreaksbr }}
+            </div>
+
+            {% if post.media %}
+                <img src="{{ post.media.url }}" class="post-image" alt="Медіафайл допису">
+            {% endif %}
+
+            <div class="post-meta">
+                {% if post.community %}
+                    Спільнота: {{ post.community.name }} ·
+                {% endif %}
+                {{ post.created_at|date:"d.m.Y H:i" }}
+            </div>
+        </div>
+
+    {% empty %}
+        <div class="empty-posts">
+            <h3>Поки що тут тихо...</h3>
+            <p>Користувач ще не опублікував жодного допису.</p>
+        </div>
+
+    {% endfor %}
+
+{% endblock %}

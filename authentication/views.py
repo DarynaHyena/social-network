@@ -1,6 +1,7 @@
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import CreateView, UpdateView, DetailView
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic import DetailView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
 from .forms import CustomUserCreationForm, UserProfileForm
