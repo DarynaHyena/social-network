@@ -56,5 +56,5 @@ class CommunityMembership(models.Model):
         verbose_name = 'Учасник спільноти'
         verbose_name_plural = 'Учасники спільнот'
 
-    def str(self):
+    def __str__(self):
         return f'{self.user.username} — {self.community.name}'

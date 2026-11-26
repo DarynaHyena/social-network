@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from django.utils.http import url_has_allowed_host_and_scheme
 from posts.mixins import PostStatsMixin
 from communities.models import CommunityMembership
+from notifications.models import Notification
 
 
 
@@ -30,8 +31,8 @@ class PostListView(PostStatsMixin, ListView):
     template_name = 'posts/list.html'
     paginate_by = 5
 
-    def get_queryset(self):
-        return Posts.objects.all().order_by('-created_at')
+    # def get_queryset(self):
+    #     return Posts.objects.all().order_by('-created_at')
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -106,8 +107,24 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        form.instance.post = get_object_or_404(Posts, pk=self.kwargs['post_pk'])
-        return super().form_valid(form)
+        form.instance.post = get_object_or_404(
+            Posts,
+            pk=self.kwargs['post_pk']
+        )
+
+        response = super().form_valid(form)
+
+        post = self.object.post
+
+        if self.request.user != post.author:
+            Notification.objects.create(
+                recipient=post.author,
+                actor=self.request.user,
+                notification_type=Notification.NotificationType.COMMENT,
+                post=post
+            )
+
+        return response
 
     def get_success_url(self):
         return reverse("post-detail", kwargs={"pk": self.object.post.pk})
@@ -180,6 +197,21 @@ def like_post(request, pk):
             reaction.vote = Like.VoteValue.LIKE
             reaction.save()
 
+    if (
+        request.user != post.author
+        and Like.objects.filter(
+            post_item=post,
+            user=request.user,
+            vote=Like.VoteValue.LIKE
+        ).exists()
+    ):
+        Notification.objects.get_or_create(
+            recipient=post.author,
+            actor=request.user,
+            notification_type=Notification.NotificationType.LIKE,
+            post=post
+        )
+
     return get_return_url(request, post)
 
 
@@ -216,5 +248,13 @@ def share_post(request, pk):
 
     if not created:
         share.delete()
+
+    if created and request.user != post.author:
+        Notification.objects.create(
+            recipient=post.author,
+            actor=request.user,
+            notification_type=Notification.NotificationType.SHARE,
+            post=post
+        )
 
     return get_return_url(request, post)

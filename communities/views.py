@@ -1,6 +1,6 @@
 from multiprocessing import context
 from urllib import response
-
+from notifications.models import Notification
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
 from communities.models import Community, CommunityMembership
@@ -94,9 +94,43 @@ class CommunityDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 @require_POST
 def join_community(request, pk):
     community = get_object_or_404(Community, pk=pk)
-    CommunityMembership.objects.get_or_create(community=community, user=request.user)
+
+    membership, created = CommunityMembership.objects.get_or_create(
+        community=community,
+        user=request.user
+    )
+
+    if created:
+        # Отримуємо власника спільноти та всіх модераторів
+        moderators = CommunityMembership.objects.filter(
+            community=community,
+            role=CommunityMembership.MembershipRole.MODERATOR
+        ).select_related('user')
+
+        recipients = set(
+            moderators.values_list('user_id', flat=True)
+        )
+
+        if community.owner_id:
+            recipients.add(community.owner_id)
+
+        # Не надсилаємо повідомлення самому собі
+        recipients.discard(request.user.id)
+
+        notifications = [
+            Notification(
+                recipient_id=recipient_id,
+                actor=request.user,
+                notification_type=Notification.NotificationType.COMMUNITY_JOIN,
+                community=community
+            )
+            for recipient_id in recipients
+        ]
+
+        Notification.objects.bulk_create(notifications)
 
     return redirect('community-detail', pk=community.pk)
+
 
 
 @login_required

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Сповіщення | Nexora{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4 mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Сповіщення</h2>
+            <p class="text-muted mb-0">
+                Усього нових: {{ unread_count }}
+            </p>
+        </div>
+
+        {% if unread_count > 0 %}
+            <form method="POST"
+                  action="{% url 'notifications-read-all' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-primary">
+                    Позначити всі прочитаними
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    {% for notification in notifications %}
+
+        <div class="card mb-3
+            {% if not notification.is_read %}
+                border-primary
+            {% endif %}">
+
+            <div class="card-body">
+
+                <div class="d-flex align-items-start gap-3">
+
+                    {% if notification.actor.avatar %}
+                        <img
+                            src="{{ notification.actor.avatar.url }}"
+                            alt="Аватар"
+                            class="rounded-circle"
+                            width="48"
+                            height="48"
+                            style="object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary
+                                    text-white d-flex align-items-center
+                                    justify-content-center"
+                             style="width: 48px; height: 48px;">
+                            {{ notification.actor.username|first }}
+                        </div>
+                    {% endif %}
+
+                    <div class="flex-grow-1">
+
+                        <p class="mb-1">
+
+                            <strong>
+                                {{ notification.actor.username }}
+                            </strong>
+
+                            {% if notification.notification_type == 'like' %}
+                                вподобав ваш допис.
+
+                            {% elif notification.notification_type == 'share' %}
+                                зробив репост вашого допису.
+
+                            {% elif notification.notification_type == 'comment' %}
+                                залишив коментар до вашого допису.
+
+                            {% elif notification.notification_type == 'community_join' %}
+                                приєднався до вашої спільноти
+                                <strong>
+                                    {{ notification.community.name }}
+                                </strong>.
+                            {% endif %}
+
+                        </p>
+
+                        <small class="text-muted">
+                            {{ notification.created_at|date:"d.m.Y H:i" }}
+                        </small>
+
+                        {% if not notification.is_read %}
+                            <span class="badge bg-primary ms-2">
+                                Нове
+                            </span>
+                        {% endif %}
+
+                        <div class="mt-2">
+
+                            <form method="POST"
+                                  action="{% url 'notification-read' notification.pk %}">
+                                {% csrf_token %}
+
+                                {% if notification.post %}
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-primary">
+                                        Переглянути допис
+                                    </button>
+
+                                {% elif notification.community %}
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-primary">
+                                        Переглянути спільноту
+                                    </button>
+                                {% endif %}
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% empty %}
+
+        <div class="text-center py-5">
+            <h4>Поки що немає сповіщень</h4>
+            <p class="text-muted">
+                Коли інші користувачі взаємодіятимуть
+                з твоїм контентом, тут з'являться повідомлення.
+            </p>
+        </div>
+
+    {% endfor %}
+
+    {% if is_paginated %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ page_obj.previous_page_number }}">
+                            Назад
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        {{ page_obj.number }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ page_obj.next_page_number }}">
+                            Далі
+                        </a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    {% endif %}
+
+</div>
+
+{% endblock %}

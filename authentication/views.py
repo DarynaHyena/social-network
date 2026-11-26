@@ -4,6 +4,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from .forms import CustomUserCreationForm, UserProfileForm
+from django.contrib import messages
 
 
 class RegisterView(CreateView):
@@ -27,5 +28,13 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['files'] = self.request.FILES
+        kwargs['instance'] = self.request.user
         return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(
+            self.request,
+            'Зміни профілю успішно збережено.'
+        )
+        return super().form_valid(form)
